@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌟 Generador de Historias Educativas v2.0</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Comic Sans MS', 'Trebuchet MS', sans-serif; }
+  body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    min-height: 100vh;
+    padding: 20px;
+    color: #333;
+  }
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 25px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    overflow: hidden;
+  }
+  header {
+    background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb, #1dd1a1, #a29bfe);
+    padding: 30px;
+    text-align: center;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+  }
+  header h1 { font-size: 2.5em; margin-bottom: 10px; }
+  header p { font-size: 1.2em; }
+  .panel {
+    padding: 25px;
+    margin: 20px;
+    background: #f8f9fa;
+    border-radius: 15px;
+    border: 3px dashed #48dbfb;
+  }
+  .panel h2 { color: #764ba2; margin-bottom: 15px; }
+  .options {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 20px 0;
+  }
+  select, button {
+    padding: 12px 20px;
+    font-size: 1.1em;
+    border-radius: 10px;
+    border: 2px solid #764ba2;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  button {
+    background: linear-gradient(135deg, #ff6b6b, #feca57);
+    color: white;
+    font-weight: bold;
+    border: none;
+  }
+  button:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+  .story-box {
+    background: linear-gradient(135deg, #fff9e6, #fff);
+    padding: 25px;
+    border-radius: 15px;
+    border-left: 6px solid #feca57;
+    line-height: 1.8;
+    font-size: 1.1em;
+    margin: 15px 0;
+  }
+  .story-box .character { color: #e17055; font-weight: bold; }
+  .story-box .place { color: #00b894; font-weight: bold; }
+  
+  .games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 15px;
+  }
+  .game-card {
+    background: #e8f5e9;
+    padding: 20px;
+    border-radius: 15px;
+    border: 3px solid #1dd1a1;
+  }
+  .game-card h3 {
+    color: #00b894;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+  }
+  .game-card .question {
+    font-size: 1.1em;
+    margin: 10px 0;
+    color: #2d3436;
+  }
+  .game-card input {
+    padding: 10px;
+    font-size: 1em;
+    border-radius: 8px;
+    border: 2px solid #1dd1a1;
+    width: 150px;
+  }
+  .option-btn {
+    display: block;
+    width: 100%;
+    margin: 8px 0;
+    padding: 10px;
+    background: white;
+    color: #2d3436;
+    border: 2px solid #74b9ff;
+    border-radius: 8px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .option-btn:hover { background: #74b9ff; color: white; }
+  .option-btn.correct { background: #00b894; color: white; border-color: #00b894; }
+  .option-btn.wrong { background: #d63031; color: white; border-color: #d63031; }
+  .tf-btn {
+    padding: 12px 25px;
+    margin: 5px;
+    font-size: 1em;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  .tf-true { background: #00b894; color: white; }
+  .tf-false { background: #d63031; color: white; }
+  
+  .match-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .match-item {
+    padding: 10px;
+    background: white;
+    border: 2px solid #fd79a8;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+  }
+  .match-item.selected { background: #fd79a8; color: white; }
+  .match-item.matched { background: #00b894; color: white; cursor: default; }
+  
+  .order-list {
+    list-style: none;
+    margin: 10px 0;
+  }
+  .order-list li {
+    padding: 10px;
+    margin: 5px 0;
+    background: white;
+    border: 2px solid #fdcb6e;
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+  }
+  
+  .feedback {
+    margin-top: 10px;
+    padding: 8px;
+    border-radius: 8px;
+    font-weight: bold;
+    text-align: center;
+    font-size: 0.95em;
+  }
+  .correct { background: #d4edda; color: #155724; }
+  .incorrect { background: #f8d7da; color: #721c24; }
+  
+  .videos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+  }
+  .video-card {
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    border: 2px solid #48dbfb;
+    transition: transform 0.3s;
+  }
+  .video-card:hover { transform: translateY(-5px); }
+  .video-card a {
+    display: block;
+    text-decoration: none;
+    color: #2d3436;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+  .video-card .desc { font-size: 0.9em; color: #636e72; }
+  
+  .score-panel {
+    background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+    padding: 15px 25px;
+    border-radius: 20px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin: 15px 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .score-item { text-align: center; }
+  .score-item .label { font-size: 0.9em; color: #636e72; }
+  .score-item .value { font-size: 1.5em; font-weight: bold; color: #d63031; }
+  
+  .medal {
+    display: inline-block;
+    font-size: 2em;
+    animation: bounce 1s infinite;
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🌟 Generador de Historias Educativas v2.0 🌟</h1>
+    <p>¡Aprende jugando con 5 materias y 5 tipos de juegos!</p>
+  </header>
+
+  <div class="panel">
+    <h2>🎨 Configura tu aventura</h2>
+    <div class="options">
+      <select id="materia">
+        <option value="literatura">📚 Literatura</option>
+        <option value="matematicas">🔢 Matemáticas</option>
+        <option value="medio">🌍 Conocimiento del Medio</option>
+        <option value="arte">🎨 Arte</option>
+        <option value="musica">🎵 Música</option>
+      </select>
+      <select id="edad">
+        <option value="6-8">6-8 años</option>
+        <option value="9-11">9-11 años</option>
+        <option value="12-14">12-14 años</option>
+      </select>
+      <button onclick="generarAventura()">✨ ¡Generar aventura!</button>
+    </div>
+  </div>
+
+  <div id="resultado" class="hidden">
+    <div class="panel">
+      <h2>📖 Tu historia</h2>
+      <div id="historia" class="story-box"></div>
+    </div>
+
+    <div class="score-panel">
+      <div class="score-item">
+        <div class="label">Puntos</div>
+        <div class="value" id="puntos">0</div>
+      </div>
+      <div class="score-item">
+        <div class="label">Aciertos</div>
+        <div class="value" id="aciertos">0</div>
+      </div>
+      <div class="score-item">
+        <div class="label">Medalla</div>
+        <div class="medal" id="medalla">🥉</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>🎮 ¡Zona de juegos! (5 tipos diferentes)</h2>
+      <div id="juegos" class="games-grid"></div>
+    </div>
+
+    <div class="panel">
+      <h2>📺 Videos recomendados</h2>
+      <div id="videos" class="videos"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const historias = {
+  literatura: {
+    personajes: ["Luna la hada lectora", "Max el dragón poeta", "Sofía la princesa escritora", "Tomás el caballero trovador"],
+    lugares: ["el Bosque de las Palabras Mágicas", "el Castillo de los Cuentos", "la Biblioteca Encantada", "el Valle de las Rimas"],
+    conflictos: ["había perdido su libro favorito", "necesitaba encontrar la palabra mágica para salvar el reino", "quería escribir el cuento más hermoso del mundo", "debía resolver un acertijo del sabio búho"],
+    lecciones: ["descubrió que leer abre mundos infinitos", "aprendió que cada palabra tiene poder", "comprendió que las historias nos hacen más sabios", "entendió que la imaginación no tiene límites"]
+  },
+  matematicas: {
+    personajes: ["Nico el número ninja", "Aria la calculadora mágica", "Leo el robot matemático", "Mía la exploradora de formas"],
+    lugares: ["el Reino de los Números", "la Isla Geométrica", "el Valle de las Fracciones", "la Montaña del Cien"],
+    conflictos: ["debía resolver ecuaciones para abrir puertas secretas", "necesitaba calcular el área del puente para cruzarlo", "tenía que ordenar números gigantes para salvar el reino", "buscaba el número perdido que completaba la secuencia"],
+    lecciones: ["descubrió que las matemáticas están en todas partes", "aprendió que los problemas tienen solución si piensas", "comprendió que los números cuentan historias", "entendió que la lógica es una superpotencia"]
+  },
+  medio: {
+    personajes: ["Eco el guardián del planeta", "Flora la exploradora de la naturaleza", "Rocky el científico curioso", "Aqua la defensora de los océanos"],
+    lugares: ["la Selva Amazónica", "el Fondo del Océano", "el Desierto del Sahara", "la Estación Espacial Internacional"],
+    conflictos: ["debía salvar a los animales en peligro", "necesitaba entender el ciclo del agua para ayudar a su pueblo", "investigaba por qué las estaciones cambian", "estudiaba los volcanes para proteger su aldea"],
+    lecciones: ["descubrió que todos somos parte de la naturaleza", "aprendió que cuidar el planeta es tarea de todos", "comprendió cómo funciona nuestro cuerpo", "entendió que la ciencia nos ayuda a vivir mejor"]
+  },
+  arte: {
+    personajes: ["Pincelín el pincel mágico", "Iris la pintora de arcoíris", "Leo el escultor de sueños", "Clara la creadora de colores"],
+    lugares: ["el Museo Encantado", "la Galería de los Colores Vivos", "el Taller de las Maravillas", "el País del Lienzo Infinito"],
+    conflictos: ["había perdido su color favorito", "necesitaba crear la obra maestra para salvar el reino", "quería mezclar colores que nadie había visto", "debía esculpir la estatua más hermosa del mundo"],
+    lecciones: ["descubrió que el arte está en todas partes", "aprendió que cada persona es un artista único", "comprendió que los colores expresan emociones", "entendió que crear es la mejor forma de soñar"]
+  },
+  musica: {
+    personajes: ["Melodía la nota musical", "Ritmo el tambor saltarín", "Arpa la hada de las cuerdas", "Bombo el gigante del sonido"],
+    lugares: ["el Valle de las Melodías", "la Orquesta Encantada", "el Bosque de los Instrumentos", "el Castillo de las Canciones"],
+    conflictos: ["había perdido su canción favorita", "necesitaba componer la sinfonía perfecta", "quería descubrir nuevos ritmos mágicos", "debía afinar todos los instrumentos del reino"],
+    lecciones: ["descubrió que la música une a las personas", "aprendió que cada sonido cuenta una historia", "comprendió que el ritmo está en nuestro corazón", "entendió que la música es el lenguaje universal"]
+  }
+};
+
+const preguntas = {
+  literatura: [
+    {q: "¿Quién escribió 'Don Quijote de la Mancha'?", a: "cervantes", opciones: ["Cervantes", "Shakespeare", "García Márquez", "Borges"]},
+    {q: "¿Cómo se llama la parte de la historia donde aparece el problema?", a: "nudo", opciones: ["Inicio", "Nudo", "Desenlace", "Título"]},
+    {q: "¿Qué figura literaria compara dos cosas con 'como'?", a: "símil", opciones: ["Metáfora", "Símil", "Hipérbole", "Rima"]},
+    {q: "¿Cuántas sílabas tiene 'mariposa'?", a: "4", opciones: ["3", "4", "5", "6"]},
+    {q: "Un adjetivo describe al sustantivo", tf: true}
+  ],
+  matematicas: [
+    {q: "¿Cuánto es 7 × 8?", a: "56", opciones: ["54", "56", "58", "64"]},
+    {q: "¿Cuántos lados tiene un hexágono?", a: "6", opciones: ["5", "6", "7", "8"]},
+    {q: "¿Raíz cuadrada de 144?", a: "12", opciones: ["10", "11", "12", "14"]},
+    {q: "¿Cuánto es 3/4 de 20?", a: "15", opciones: ["12", "15", "18", "20"]},
+    {q: "Un triángulo tiene todos sus lados iguales", tf: false}
+  ],
+  medio: [
+    {q: "¿Planeta más grande del sistema solar?", a: "júpiter", opciones: ["Marte", "Tierra", "Júpiter", "Saturno"]},
+    {q: "¿Qué gas respiramos?", a: "oxigeno", opciones: ["Hidrógeno", "Oxígeno", "Nitrógeno", "Helio"]},
+    {q: "¿Cuántos continentes hay?", a: "6", opciones: ["5", "6", "7", "8"]},
+    {q: "¿Órgano más grande del cuerpo?", a: "piel", opciones: ["Hígado", "Pulmón", "Piel", "Corazón"]},
+    {q: "Las plantas producen oxígeno", tf: true}
+  ],
+  arte: [
+    {q: "¿Quién pintó la Mona Lisa?", a: "leonardo da vinci", opciones: ["Picasso", "Van Gogh", "Leonardo da Vinci", "Dalí"]},
+    {q: "¿Cuántos colores primarios hay?", a: "3", opciones: ["2", "3", "4", "5"]},
+    {q: "¿Qué técnica usa puntos pequeños?", a: "puntillismo", opciones: ["Acuarela", "Puntillismo", "Óleo", "Fresco"]},
+    {q: "¿Mezcla de azul y amarillo?", a: "verde", opciones: ["Verde", "Morado", "Naranja", "Marrón"]},
+    {q: "El arte abstracto representa la realidad tal cual", tf: false}
+  ],
+  musica: [
+    {q: "¿Cuántas notas musicales hay?", a: "7", opciones: ["5", "6", "7", "8"]},
+    {q: "¿Instrumento de cuerda?", a: "guitarra", opciones: ["Flauta", "Guitarra", "Tambor", "Trompeta"]},
+    {q: "¿Quién compuso la 'Novena Sinfonía'?", a: "beethoven", opciones: ["Mozart", "Beethoven", "Bach", "Chopin"]},
+    {q: "¿Qué indica el tempo?", a: "velocidad", opciones: ["Volumen", "Velocidad", "Altura", "Timbre"]},
+    {q: "El piano es un instrumento de percusión", tf: true}
+  ]
+};
+
+const matching = {
+  literatura: [
+    {pairs: [["Autor de El Quijote", "Cervantes"], ["Poema con rima", "Verso"], ["Persona del cuento", "Personaje"]]},
+    {pairs: [["Inicio de la historia", "Planteamiento"], ["Problema", "Nudo"], ["Final", "Desenlace"]]}
+  ],
+  matematicas: [
+    {pairs: [["Forma de 3 lados", "Triángulo"], ["Forma de 4 lados", "Cuadrado"], ["Forma de 5 lados", "Pentágono"]]},
+    {pairs: [["7 × 8", "56"], ["9 × 9", "81"], ["6 × 7", "42"]]}
+  ],
+  medio: [
+    {pairs: [["Planeta rojo", "Marte"], ["Planeta con anillos", "Saturno"], ["Nuestro planeta", "Tierra"]]},
+    {pairs: [["Animal mamífero", "Ballena"], ["Anfibio", "Rana"], ["Reptil", "Cocodrilo"]]}
+  ],
+  arte: [
+    {pairs: [["Azul + Amarillo", "Verde"], ["Rojo + Azul", "Morado"], ["Rojo + Amarillo", "Naranja"]]},
+    {pairs: [["Mona Lisa", "Da Vinci"], ["La noche estrellada", "Van Gogh"], ["Guernica", "Picasso"]]}
+  ],
+  musica: [
+    {pairs: [["Instrumento de viento", "Flauta"], ["Instrumento de cuerda", "Violín"], ["Instrumento de percusión", "Tambor"]]},
+    {pairs: [["Nota grave", "Bajo"], ["Nota aguda", "Soprano"], ["Ritmo rápido", "Presto"]]}
+  ]
+};
+
+const ordenar = {
+  literatura: [
+    {items: ["Planteamiento", "Nudo", "Desenlace"], titulo: "Ordena las partes de un cuento"},
+    {items: ["Título", "Inicio", "Desarrollo", "Final"], titulo: "Ordena la estructura narrativa"}
+  ],
+  matematicas: [
+    {items: ["Suma", "Resta", "Multiplicación", "División"], titulo: "Ordena las operaciones básicas"},
+    {items: ["Unidad", "Decena", "Centena", "Millar"], titulo: "Ordena de menor a mayor"}
+  ],
+  medio: [
+    {items: ["Evaporación", "Condensación", "Precipitación"], titulo: "Ordena el ciclo del agua"},
+    {items: ["Huevo", "Larva", "Pupa", "Mariposa"], titulo: "Ordena la metamorfosis"}
+  ],
+  arte: [
+    {items: ["Boceto", "Colores base", "Detalles", "Acabado"], titulo: "Ordena el proceso de pintar"},
+    {items: ["Rojo", "Naranja", "Amarillo", "Verde", "Azul", "Violeta"], titulo: "Ordena el arcoíris"}
+  ],
+  musica: [
+    {items: ["Do", "Re", "Mi", "Fa", "Sol", "La", "Si"], titulo: "Ordena la escala musical"},
+    {items: ["Pianissimo", "Piano", "Mezzo-forte", "Forte", "Fortissimo"], titulo: "Ordena de suave a fuerte"}
+  ]
+};
+
+const videos = {
+  literatura: [
+    {titulo: "📚 ¿Qué es un cuento?", url: "https://www.youtube.com/results?search_query=cuento+para+niños+educativo", desc: "Aprende las partes de un cuento"},
+    {titulo: "✍️ Cómo escribir tu propia historia", url: "https://www.youtube.com/results?search_query=como+escribir+un+cuento+niños", desc: "Tutorial creativo"},
+    {titulo: "🎭 Figuras literarias", url: "https://www.youtube.com/results?search_query=figuras+literarias+niños", desc: "Metáforas y símiles"}
+  ],
+  matematicas: [
+    {titulo: "🔢 Matemáticas divertidas", url: "https://www.youtube.com/results?search_query=matematicas+divertidas+niños", desc: "Aprende jugando"},
+    {titulo: "📐 Geometría para niños", url: "https://www.youtube.com/results?search_query=geometria+basica+niños", desc: "Figuras y propiedades"},
+    {titulo: "🧮 Trucos de multiplicación", url: "https://www.youtube.com/results?search_query=trucos+multiplicar+niños", desc: "Multiplica más rápido"}
+  ],
+  medio: [
+    {titulo: "🌍 El sistema solar", url: "https://www.youtube.com/results?search_query=sistema+solar+niños", desc: "Viaja por el espacio"},
+    {titulo: "🌱 El ciclo del agua", url: "https://www.youtube.com/results?search_query=ciclo+del+agua+niños", desc: "Descubre el agua"},
+    {titulo: "🦁 Animales del mundo", url: "https://www.youtube.com/results?search_query=animales+del+mundo+niños", desc: "Fauna global"}
+  ],
+  arte: [
+    {titulo: "🎨 Los colores primarios", url: "https://www.youtube.com/results?search_query=colores+primarios+niños", desc: "Aprende sobre colores"},
+    {titulo: "🖼️ Grandes pintores", url: "https://www.youtube.com/results?search_query=pintores+famosos+niños", desc: "Conoce a los maestros"},
+    {titulo: "✏️ Dibujo paso a paso", url: "https://www.youtube.com/results?search_query=dibujo+paso+a+paso+niños", desc: "Aprende a dibujar"}
+  ],
+  musica: [
+    {titulo: "🎵 Las notas musicales", url: "https://www.youtube.com/results?search_query=notas+musicales+niños", desc: "Do Re Mi Fa Sol La Si"},
+    {titulo: "🎹 Instrumentos musicales", url: "https://www.youtube.com/results?search_query=instrumentos+musicales+niños", desc: "Conoce los instrumentos"},
+    {titulo: "🎼 Ritmo y compás", url: "https://www.youtube.com/results?search_query=ritmo+musical+niños", desc: "Aprende a seguir el ritmo"}
+  ]
+};
+
+let puntos = 0;
+let aciertos = 0;
+let totalIntentos = 0;
+
+function generarAventura() {
+  const materia = document.getElementById('materia').value;
+  const edad = document.getElementById('edad').value;
+  const data = historias[materia];
+
+  const personaje = data.personajes[Math.floor(Math.random() * data.personajes.length)];
+  const lugar = data.lugares[Math.floor(Math.random() * data.lugares.length)];
+  const conflicto = data.conflictos[Math.floor(Math.random() * data.conflictos.length)];
+  const leccion = data.lecciones[Math.floor(Math.random() * data.lecciones.length)];
+
+  const historiaHTML = `
+    <p>Érase una vez <span class="character">${personaje}</span>, 
+    que vivía en <span class="place">${lugar}</span>.</p>
+    <p>Un día, ${personaje.split(' ')[0]} ${conflicto}. 
+    Con valentía y curiosidad, emprendió un viaje increíble 
+    donde conoció amigos maravillosos y superó grandes desafíos.</p>
+    <p>Al final de su aventura, <span class="character">${personaje.split(' ')[0]}</span> 
+    ${leccion} 🌟</p>
+    <p><em>Y colorín colorado, esta historia ha terminado.</em></p>
+  `;
+  document.getElementById('historia').innerHTML = historiaHTML;
+
+  generarJuegos(materia);
+  mostrarVideos(materia);
+
+  puntos = 0;
+  aciertos = 0;
+  totalIntentos = 0;
+  actualizarMarcador();
+  document.getElementById('resultado').classList.remove('hidden');
+  document.getElementById('resultado').scrollIntoView({behavior: 'smooth'});
+}
+
+function actualizarMarcador() {
+  document.getElementById('puntos').textContent = puntos;
+  document.getElementById('aciertos').textContent = aciertos;
+  let medalla = '🥉';
+  if (puntos >= 100) medalla = '🏆';
+  else if (puntos >= 50) medalla = '🥇';
+  else if (puntos >= 25) medalla = '🥈';
+  document.getElementById('medalla').textContent = medalla;
+}
+
+function sumarPuntos(esCorrecto) {
+  totalIntentos++;
+  if (esCorrecto) {
+    puntos += 10;
+    aciertos++;
+  }
+  actualizarMarcador();
+}
+
+function generarJuegos(materia) {
+  const cont = document.getElementById('juegos');
+  cont.innerHTML = '';
+  
+  cont.appendChild(crearJuegoOpcionMultiple(materia));
+  cont.appendChild(crearJuegoVF(materia));
+  cont.appendChild(crearJuegoMatching(materia));
+  cont.appendChild(crearJuegoOrdenar(materia));
+  cont.appendChild(crearJuegoLibre(materia));
+}
+
+function crearJuegoOpcionMultiple(materia) {
+  const card = document.createElement('div');
+  card.className = 'game-card';
+  const banco = preguntas[materia].filter(p => p.opciones);
+  const preg = banco[Math.floor(Math.random() * banco.length)];
+  
+  let opcionesHTML = preg.opciones.map(op => 
+    `<button class="option-btn" onclick="responderOpcion(this, '${op.toLowerCase()}', '${preg.a.toLowerCase()}')">${op}</button>`
+  ).join('');
+  
+  card.innerHTML = `
+    <h3>🎯 Opción múltiple</h3>
+    <p class="question">${preg.q}</p>
+    ${opcionesHTML}
+    <div class="feedback hidden" id="fb-opcion"></div>
+  `;
+  return card;
+}
+
+function responderOpcion(btn, elegida, correcta) {
+  const fb = btn.parentElement.querySelector('#fb-opcion');
+  const botones = btn.parentElement.querySelectorAll('.option-btn');
+  botones.forEach(b => b.disabled = true);
+  
+  if (elegida === correcta) {
+    btn.classList.add('correct');
+    fb.className = 'feedback correct';
+    fb.textContent = '🎉 ¡Correcto! +10 puntos';
+    sumarPuntos(true);
+  } else {
+    btn.classList.add('wrong');
+    botones.forEach(b => {
+      if (b.textContent.toLowerCase() === correcta) b.classList.add('correct');
+    });
+    fb.className = 'feedback incorrect';
+    fb.textContent = `💡 La respuesta era: ${correcta}`;
+    sumarPuntos(false);
+  }
+  fb.classList.remove('hidden');
+}
+
+function crearJuegoVF(materia) {
+  const card = document.createElement('div');
+  card.className = 'game-card';
+  const banco = preguntas[materia].filter(p => p.tf !== undefined);
+  const preg = banco[Math.floor(Math.random() * banco.length)];
+  
+  card.innerHTML = `
+    <h3>✅❌ Verdadero o Falso</h3>
+    <p class="question">${preg.q}</p>
+    <button class="tf-btn tf-true" onclick="responderVF(this, true, ${preg.tf})">✓ Verdadero</button>
+    <button class="tf-btn tf-false" onclick="responderVF(this, false, ${preg.tf})">✗ Falso</button>
+    <div class="feedback hidden" id="fb-vf"></div>
+  `;
+  return card;
+}
+
+function responderVF(btn, elegida, correcta) {
+  const card = btn.parentElement;
+  const fb = card.querySelector('#fb-vf');
+  const botones = card.querySelectorAll('.tf-btn');
+  botones.forEach(b => b.disabled = true);
+  
+  if (elegida === correcta) {
+    btn.style.background = '#00b894';
+    fb.className = 'feedback correct';
+    fb.textContent = '🎉 ¡Correcto! +10 puntos';
+    sumarPuntos(true);
+  } else {
+    btn.style.background = '#d63031';
+    fb.className = 'feedback incorrect';
+    fb.textContent = `💡 La respuesta era: ${correcta ? 'Verdadero' : 'Falso'}`;
+    sumarPuntos(false);
+  }
+  fb.classList.remove('hidden');
+}
+
+function crearJuegoMatching(materia) {
+  const card = document.createElement('div');
+  card.className = 'game-card';
+  const banco = matching[materia];
+  const set = banco[Math.floor(Math.random() * banco.length)];
+  
+  const izq = set.pairs.map(p => p[0]);
+  const der = set.pairs.map(p => p[1]).sort(() => Math.random() - 0.5);
+  
+  card.dataset.pairs = JSON.stringify(set.pairs);
+  card.dataset.selectedIzq = '';
+  card.dataset.matched = '0';
+  
+  let html = `<h3>🔗 Empareja</h3><div class="match-grid">`;
+  html += `<div>` + izq.map((item, i) => 
+    `<div class="match-item" data-side="izq" data-value="${item}" onclick="seleccionarMatch(this)">${item}</div>`
+  ).join('') + `</div>`;
+  html += `<div>` + der.map(item => 
+    `<div class="match-item" data-side="der" data-value="${item}" onclick="seleccionarMatch(this)">${item}</div>`
+  ).join('') + `</div>`;
+  html += `</div><div class="feedback hidden" id="fb-match"></div>`;
+  
+  card.innerHTML = html;
+  return card;
+}
+
+function seleccionarMatch(el) {
+  const card = el.closest('.game-card');
+  if (el.classList.contains('matched')) return;
+  
+  const side = el.dataset.side;
+  const value = el.dataset.value;
+  
+  if (side === 'izq') {
+    card.querySelectorAll('[data-side="izq"]').forEach(e => e.classList.remove('selected'));
+    el.classList.add('selected');
+    card.dataset.selectedIzq = value;
+  } else {
+    const izqVal = card.dataset.selectedIzq;
+    if (!izqVal) return;
+    
+    const pairs = JSON.parse(card.dataset.pairs);
+    const pareja = pairs.find(p => p[0] === izqVal);
+    const fb = card.querySelector('#fb-match');
+    
+    if (pareja && pareja[1] === value) {
+      card.querySelectorAll(`[data-value="${izqVal}"]`).forEach(e => {
+        e.classList.remove('selected');
+        e.classList.add('matched');
+      });
+      el.classList.add('matched');
+      card.dataset.selectedIzq = '';
+      let matched = parseInt(card.dataset.matched) + 1;
+      card.dataset.matched = matched;
+      
+      if (matched === pairs.length) {
+        fb.className = 'feedback correct';
+        fb.textContent = '🎉 ¡Todos emparejados! +20 puntos';
+        fb.classList.remove('hidden');
+        sumarPuntos(true);
+        sumarPuntos(true);
+      }
+    } else {
+      el.classList.add('selected');
+      setTimeout(() => {
+        el.classList.remove('selected');
+        card.querySelectorAll(`[data-value="${izqVal}"]`).forEach(e => e.classList.remove('selected'));
+        card.dataset.selectedIzq = '';
+      }, 600);
+    }
+  }
+}
+
+function crearJuegoOrdenar(materia) {
+  const card = document.createElement('div');
+  card.className = 'game-card';
+  const banco = ordenar[materia];
+  const set = banco[Math.floor(Math.random() * banco.length)];
+  
+  const mezclados = [...set.items].sort(() => Math.random() - 0.5);
+  card.dataset.correcto = JSON.stringify(set.items);
+  
+  let html = `<h3>🔢 Ordena la secuencia</h3>
+    <p class="question">${set.titulo}</p>
+    <ul class="order-list" id="order-list">`;
+  mezclados.forEach((item, i) => {
+    html += `<li data-item="${item}" onclick="moverItem(this)">${item}</li>`;
+  });
+  html += `</ul>
+    <button onclick="comprobarOrden(this)">✅ Comprobar orden</button>
+    <div class="feedback hidden" id="fb-orden"></div>`;
+  
+  card.innerHTML = html;
+  return card;
+}
+
+let itemSeleccionado = null;
+function moverItem(el) {
+  if (itemSeleccionado === null) {
+    itemSeleccionado = el;
+    el.style.background = '#fdcb6e';
+  } else {
+    const parent = el.parentElement;
+    const items = [...parent.children];
+    const idx1 = items.indexOf(itemSeleccionado);
+    const idx2 = items.indexOf(el);
+    
+    if (idx1 < idx2) {
+      parent.insertBefore(itemSeleccionado, el.nextSibling);
+    } else {
+      parent.insertBefore(itemSeleccionado, el);
+    }
+    itemSeleccionado.style.background = 'white';
+    itemSeleccionado = null;
+  }
+}
+
+function comprobarOrden(btn) {
+  const card = btn.parentElement;
+  const list = card.querySelector('#order-list');
+  const actual = [...list.children].map(li => li.dataset.item);
+  const correcto = JSON.parse(card.dataset.correcto);
+  const fb = card.querySelector('#fb-orden');
+  
+  const esCorrecto = JSON.stringify(actual) === JSON.stringify(correcto);
+  if (esCorrecto) {
+    fb.className = 'feedback correct';
+    fb.textContent = '🎉 ¡Orden perfecto! +15 puntos';
+    sumarPuntos(true);
+  } else {
+    fb.className = 'feedback incorrect';
+    fb.textContent = `💡 Orden correcto: ${correcto.join(' → ')}`;
+    sumarPuntos(false);
+  }
+  fb.classList.remove('hidden');
+}
+
+function crearJuegoLibre(materia) {
+  const card = document.createElement('div');
+  card.className = 'game-card';
+  const banco = preguntas[materia];
+  const preg = banco[Math.floor(Math.random() * banco.length)];
+  
+  card.dataset.respuesta = preg.a;
+  
+  card.innerHTML = `
+    <h3>✍️ Respuesta libre</h3>
+    <p class="question">${preg.q}</p>
+    <input type="text" id="resp-libre" placeholder="Escribe tu respuesta...">
+    <button onclick="comprobarLibre(this)">✅ Comprobar</button>
+    <div class="feedback hidden" id="fb-libre"></div>
+  `;
+  return card;
+}
+
+function comprobarLibre(btn) {
+  const card = btn.parentElement;
+  const input = card.querySelector('#resp-libre');
+  const fb = card.querySelector('#fb-libre');
+  const resp = input.value.trim().toLowerCase();
+  const correcta = card.dataset.respuesta.toLowerCase();
+  
+  if (resp === correcta || (correcta.includes(resp) && resp.length > 2)) {
+    fb.className = 'feedback correct';
+    fb.textContent = '🎉 ¡Correcto! +10 puntos';
+    sumarPuntos(true);
+  } else {
+    fb.className = 'feedback incorrect';
+    fb.innerHTML = `💡 La respuesta era: <strong>${correcta}</strong>`;
+    sumarPuntos(false);
+  }
+  fb.classList.remove('hidden');
+}
+
+function mostrarVideos(materia) {
+  const lista = videos[materia];
+  document.getElementById('videos').innerHTML = lista.map(v => `
+    <div class="video-card">
+      <a href="${v.url}" target="_blank">${v.titulo}</a>
+      <p class="desc">${v.desc}</p>
+    </div>
+  `).join('');
+}
+</script>
+</body>
+</html>
